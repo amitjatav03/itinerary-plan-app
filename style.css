@@ -1,4 +1,9 @@
 @font-face {
     font-family: ppwoodland;
-    src: url(PPWoodland.woff2);
+    src: url(fonts/ppwoodland.woff2);
+}
+
+@font-face {
+    font-family: gilroy;
+    src: url(fonts/gilroy-med.ttf);
 }
