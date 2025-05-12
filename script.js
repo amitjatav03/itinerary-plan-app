@@ -68,25 +68,77 @@ tripForm.addEventListener("submit", function(e) {
 
 
 // function to download PDF using jsPDF library
+// function downloadPDF() {
+//     // get the output element content
+//     const output = document.getElementById("output");
+//     const content = output.innerText || output.textContent;
+    
+//     // create new jsPDF instance
+//     const { jsPDF } = window.jspdf;
+//     const doc = new jsPDF();
+    
+//     // set font size
+//     doc.setFontSize(12);
+
+//     // adding text wrap
+//     const splitText = doc.splitTextToSize(content, 180); // 180 is the max width
+//     doc.text(splitText, 15, 15);
+
+//     // set content to the pdf doc file
+//     // doc.text(content, 15, 15);
+    
+//     // save the pdf
+//     // doc.save("travel-itinerary.pdf");
+
+//     // Prompt user for file name
+//     let fileName = prompt("Enter a name for your PDF file:", "travel-itinerary");
+//     if (!fileName) {
+//         fileName = "document"; // fallback name
+//     }
+
+//     // Save the PDF with user-defined name
+//     doc.save(fileName + ".pdf");
+// }
+
+
 function downloadPDF() {
-    // get the output element content
     const output = document.getElementById("output");
-    const content = output.innerText || output.textContent;
-    
-    // create new jsPDF instance
+    let content = output.innerText || output.textContent;
+
+    // 🔹 Remove extra blank lines (multiple \n)
+    content = content
+        .split('\n')                  // split into lines
+        .map(line => line.trim())     // trim each line
+        .filter(line => line !== "")  // remove empty lines
+        .join('\n');                  // join back
+
     const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    // set font size
-    doc.setFontSize(12);
+    const doc = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+    });
 
-    // adding text wrap
-    const splitText = doc.splitTextToSize(content, 180); // 180 is the max width
-    doc.text(splitText, 15, 15);
+    doc.setFontSize(11);
+    const lineHeight = 6;
+    const marginLeft = 15;
+    const marginTop = 15;
+    const pageHeight = doc.internal.pageSize.height;
 
-    // set content to the pdf doc file
-    // doc.text(content, 15, 15);
-    
-    // save the pdf
-    doc.save("travel-itinerary.pdf");
+    const lines = doc.splitTextToSize(content, 180); // width = 180mm
+    let y = marginTop;
+
+    lines.forEach((line) => {
+        if (y + lineHeight > pageHeight - marginTop) {
+            doc.addPage();
+            y = marginTop;
+        }
+        doc.text(line, marginLeft, y);
+        y += lineHeight;
+    });
+
+    // 🔹 Prompt for filename
+    let fileName = prompt("Enter a name for your PDF file:", "travel-itinerary");
+    if (!fileName) fileName = "document";
+    doc.save(fileName + ".pdf");
 }
